@@ -47,3 +47,13 @@ nav.navbar, .footer
 
     .match_slip
       page-break-inside: avoid
+
+// simple radio button toggle
+input.radio-toggle
+  display: none
+
+.radio-toggle-content
+  display: none
+
+  input.radio-toggle:checked + &
+    display: block

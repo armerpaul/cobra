@@ -1,0 +1,87 @@
+- if @current_user_player
+	.card.registration
+		.card-header
+			h5.card-title.mb-0 My Registration Information
+		ul.list-group.list-group-flush
+			li.list-group-item
+				.small.text-secondary Name:
+				| #{@current_user_player.name}
+			li.list-group-item
+				.small.text-secondary Corp ID:
+				input.radio-toggle type="radio" name="player_corp_id" id="view_corp" checked="checked"
+				.radio-toggle-content
+					.registration-form-controls
+						label.text-primary for="edit_corp" title="Edit Corp ID"
+							=> fa_icon 'pencil'
+					= render @current_user_player.corp_identity_object
+				input.radio-toggle type="radio" name="player_corp_id" id="edit_corp"
+				.radio-toggle-content
+					.registration-form-controls
+						label.text-secondary for="view_corp" title="Cancel"
+							=> fa_icon 'times-circle'
+						label.text-success for="view_corp" title="Save Corp ID"
+							=> fa_icon 'check-circle'
+					= simple_form_for @current_user_player, url: tournament_player_path(@tournament, @current_user_player) do |f|
+						= f.input_field :corp_identity, placeholder: 'Search for corp ID',
+							class: 'form-control corp_identities'
+			li.list-group-item
+				.small.text-secondary Runner ID:
+				input.radio-toggle type="radio" name="player_runner_id" id="view_runner" checked="checked"
+				.radio-toggle-content
+					.registration-form-controls
+						label.text-primary for="edit_runner" title="Edit Runner ID"
+							=> fa_icon 'pencil'
+					= render @current_user_player.runner_identity_object
+				input.radio-toggle type="radio" name="player_runner_id" id="edit_runner"
+				.radio-toggle-content
+					.registration-form-controls
+						label.text-secondary for="view_runner" title="Cancel"
+							=> fa_icon 'times-circle'
+						label.text-success for="view_runner" title="Save Runner ID"
+							=> fa_icon 'check-circle'
+					= simple_form_for @current_user_player, url: tournament_player_path(@tournament, @current_user_player) do |f|
+						= f.input_field :runner_identity, placeholder: 'Search for runner ID',
+							class: 'form-control runner_identities'
+			li.list-group-item
+				.small.text-secondary First Round Bye:
+				- if @current_user_player.first_round_bye
+					.badge.badge-success YES
+				- else
+					.badge.badge-secondary NO
+- else
+	- if @tournament.self_registration?
+		- if current_user
+			- unless @current_user_player
+				.card.alert.alert-secondary
+					.card-body
+						- unless @current_user_dropped
+							h5.card-title Register for this Event
+							= simple_form_for :player, url: tournament_players_path(@tournament) do |f|
+								= render 'players/form', f: f, default_name: current_user ? current_user.nrdb_username : ''
+								.text-right
+									= button_tag type: :submit, class: 'btn btn-primary', disabled: (not current_user) do
+										=> fa_icon 'user-plus'
+										| Register
+						- else
+							h5.card-title Rejoin this Event
+							- if @current_user_is_running_tournament
+								p
+									| You can re-instate yourself on the
+									=<> link_to tournament_players_path(@tournament) do
+										| Players
+									| tab.
+							- else
+								p Talk to a Tournmanet Organiser to rejoin the event
+		- else
+			.card.alert.alert-warning
+				.card-body
+					h5.card-title Register for this Event
+					p.mb-1 You must be logged in to register for this tournamet:
+					= link_to login_path, class: 'alert-link' do
+						=> fa_icon 'sign-in'
+						| Sign in
+					p.mt-4.mb-1
+						| Don't have an account? Register with NetrunnerDB, then return to Cobra to login:
+					= link_to 'https://netrunnerdb.com/register/', class: 'alert-link'
+						span.icon.icon-link
+						| &nbsp;Create NRDB account
